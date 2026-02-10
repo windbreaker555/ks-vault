@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K's Vault — Encrypt Your Cookies at Rest</title>
+  <meta name="description" content="Browser extension that encrypts cookies using AES-256-GCM to protect your sessions from infostealer malware.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0C0C0C;
+      --bg-raised: #141414;
+      --bg-card: #1A1A1A;
+      --border: #2A2A2A;
+      --text: #FBFDF0;
+      --text-dim: #8A8B80;
+      --green: #70B270;
+      --green-glow: rgba(112, 178, 112, 0.15);
+      --green-dim: #4A8A4A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Nav ---- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(12, 12, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--green);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ---- Sections ---- */
+    section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .hero {
+      padding-top: 160px;
+      padding-bottom: 100px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: var(--green); }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin: 0 auto 36px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      background: #85C285;
+      box-shadow: 0 0 20px var(--green-glow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ---- Section titles ---- */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      color: var(--text-dim);
+      font-size: 16px;
+      max-width: 600px;
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      max-width: 960px;
+      margin: 0 auto;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ---- Problem section ---- */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    .problem-card.danger { border-color: #C45B5B33; }
+    .problem-card.safe { border-color: #70B27033; }
+
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .problem-card.danger h3 { color: #D46A6A; }
+    .problem-card.safe h3 { color: var(--green); }
+
+    .problem-card p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+
+    .problem-card code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: rgba(255,255,255,0.05);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* ---- How it works ---- */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      position: relative;
+    }
+
+    .step-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--green);
+      opacity: 0.3;
+      margin-bottom: 12px;
+    }
+
+    .step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ---- Features ---- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 14px;
+      padding: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .feature-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green-glow);
+      border-radius: 6px;
+    }
+
+    .feature h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feature p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ---- Architecture ---- */
+    .arch-code {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    .arch-code .comment { color: var(--text-dim); }
+    .arch-code .file { color: var(--green); }
+    .arch-code .desc { color: var(--text); opacity: 0.7; }
+
+    .arch-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .arch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .arch-card h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--green);
+      margin-bottom: 10px;
+    }
+
+    .arch-card p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ---- Permissions ---- */
+    .perm-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .perm-table th {
+      text-align: left;
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .perm-table td {
+      padding: 14px 18px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .perm-table tr:last-child td { border-bottom: none; }
+
+    .perm-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .perm-table td:last-child { color: var(--text-dim); }
+
+    /* ---- Privacy ---- */
+    .privacy-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 36px;
+    }
+
+    .privacy-content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
+
+    .privacy-content h3:first-child { margin-top: 0; }
+
+    .privacy-content p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .privacy-content ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+
+    .privacy-content li {
+      font-size: 14px;
+      color: var(--text-dim);
+      padding: 4px 0 4px 20px;
+      position: relative;
+    }
+
+    .privacy-content li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+    }
+
+    .privacy-content strong { color: var(--text); font-weight: 500; }
+
+    /* ---- Footer ---- */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    footer a {
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 768px) {
+      .problem-grid, .steps, .features-grid, .arch-detail {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links { display: none; }
+      section { padding: 60px 20px; }
+      .hero { padding-top: 120px; padding-bottom: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">K's Vault</a>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="https://github.com/windbreaker555/ks-vault">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Encrypt your cookies.<br><span>Deny the stealers.</span></h1>
+    <p>K's Vault removes your session cookies from the browser's native store and encrypts them with AES-256-GCM. Malware that dumps your cookie database gets nothing.</p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary">Get it on Firefox</a>
+      <a href="https://github.com/windbreaker555/ks-vault" class="btn btn-secondary">View Source</a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Problem -->
+  <section id="problem">
+    <div class="section-label">The Problem</div>
+    <h2>Your cookies are sitting unprotected on disk</h2>
+    <p class="section-desc">Infostealer malware copies your browser's cookie database and sends it to an attacker. They paste your session tokens into their browser and access your accounts — no password needed.</p>
+    <div class="problem-grid">
+      <div class="problem-card danger">
+        <h3>Without K's Vault</h3>
+        <p>Cookies stored in <code>cookies.sqlite</code> as plaintext. Any process running as your user can read them. Stealers extract and exfiltrate in seconds.</p>
+      </div>
+      <div class="problem-card safe">
+        <h3>With K's Vault</h3>
+        <p>Cookie store is empty for protected sites. Session tokens exist only inside AES-256-GCM encrypted blobs in the extension's IndexedDB. Stealers get useless ciphertext.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- How It Works -->
+  <section id="how">
+    <div class="section-label">How It Works</div>
+    <h2>Three steps to encrypted sessions</h2>
+    <p class="section-desc">K's Vault sits between your browser and the server, handling encryption and decryption transparently on every request.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h3>Choose sites to protect</h3>
+        <p>Log into a site normally, then click "Protect this site." K's Vault migrates existing cookies into the encrypted store and deletes the originals.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h3>Cookies are encrypted</h3>
+        <p>Each cookie is encrypted with a unique derived key using AES-256-GCM. New cookies from the server are intercepted, encrypted, and stripped before the browser can store them.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h3>Browse normally</h3>
+        <p>On every outgoing request, K's Vault decrypts cookies in memory for milliseconds, injects them into the request header, and the server receives a valid session.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Features -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <h2>Built by penetration testers</h2>
+    <p class="section-desc">Designed around real-world attack scenarios we encounter during security assessments.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">🔐</div>
+        <div>
+          <h3>AES-256-GCM</h3>
+          <p>Per-cookie key derivation using PBKDF2 + HKDF. 600K iterations. Non-extractable CryptoKeys via WebCrypto API.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🚨</div>
+        <div>
+          <h3>Emergency Wipe</h3>
+          <p>One click or Ctrl+Shift+K destroys all encrypted data permanently. Configurable auto-wipe after failed password attempts.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <div>
+          <h3>Domain-Aware</h3>
+          <p>Protects root domain and all subdomains with a single click. Cookies from sso.example.com and www.example.com are covered together.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔇</div>
+        <div>
+          <h3>Zero Telemetry</h3>
+          <p>No analytics, no network requests, no data collection of any kind. Everything stays on your device.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔑</div>
+        <div>
+          <h3>Password Re-entry</h3>
+          <p>Configurable auto-lock timeout. Re-enter your password on browser start or at custom intervals.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📖</div>
+        <div>
+          <h3>Open Source</h3>
+          <p>Vanilla JavaScript, zero dependencies, no build tools. Every line is auditable. MIT licensed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Architecture -->
+  <section id="architecture">
+    <div class="section-label">Architecture</div>
+    <h2>How it's built</h2>
+    <p class="section-desc">Vanilla JavaScript, WebCrypto API, IndexedDB. No frameworks, no dependencies, no supply chain risk.</p>
+
+    <div class="arch-code">
+      <span class="comment">// Project structure</span><br>
+      <span class="file">lib/crypto.js</span> <span class="desc">← PBKDF2, HKDF, AES-256-GCM</span><br>
+      <span class="file">lib/storage.js</span> <span class="desc">← IndexedDB encrypted blob management</span><br>
+      <span class="file">lib/interceptor.js</span> <span class="desc">← webRequest hooks for Set-Cookie / Cookie</span><br>
+      <span class="file">background.js</span> <span class="desc">← State manager, message router</span><br>
+      <span class="file">popup/</span> <span class="desc">← Extension popup UI</span><br>
+      <span class="file">settings/</span> <span class="desc">← Settings page</span>
+    </div>
+
+    <div class="arch-detail">
+      <div class="arch-card">
+        <h3>Incoming cookies</h3>
+        <p>Server sends Set-Cookie → webRequest intercepts → value encrypted with per-cookie HKDF key → stored in IndexedDB → header stripped. Browser never stores plaintext.</p>
+      </div>
+      <div class="arch-card">
+        <h3>Outgoing requests</h3>
+        <p>Request to protected domain → encrypted cookies read from IndexedDB → decrypted with master key → injected into Cookie header → server receives valid session.</p>
+      </div>
+      <div class="arch-card">
+        <h3>Key derivation</h3>
+        <p>Master password → PBKDF2 (600K iterations) → non-extractable CryptoKey. Each cookie gets a unique key via HKDF using domain + name + timestamp as context.</p>
+      </div>
+      <div class="arch-card">
+        <h3>Domain isolation</h3>
+        <p>Compromising one cookie's key cannot reveal others. AAD binding prevents cross-domain tampering. Verification hash is cryptographically independent from encryption key.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Permissions -->
+  <section id="permissions">
+    <div class="section-label">Permissions</div>
+    <h2>Why these permissions</h2>
+    <p class="section-desc">Every permission is required for core functionality. None are used for data collection.</p>
+    <table class="perm-table">
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>cookies</td>
+          <td>Read, encrypt, and migrate cookies for domains you choose to protect</td>
+        </tr>
+        <tr>
+          <td>webRequest</td>
+          <td>Intercept Set-Cookie response headers and Cookie request headers</td>
+        </tr>
+        <tr>
+          <td>webRequestBlocking</td>
+          <td>Modify headers synchronously before the browser processes them</td>
+        </tr>
+        <tr>
+          <td>&lt;all_urls&gt;</td>
+          <td>Operate on any domain you select — only activates for protected domains</td>
+        </tr>
+        <tr>
+          <td>storage</td>
+          <td>Save your settings locally (protected domains, preferences)</td>
+        </tr>
+        <tr>
+          <td>notifications</td>
+          <td>Alert you after an emergency wipe</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Privacy Policy -->
+  <section id="privacy">
+    <div class="section-label">Privacy Policy</div>
+    <h2>Your data stays yours</h2>
+    <div class="privacy-content">
+      <p><strong>Last updated:</strong> February 2025</p>
+
+      <h3>Data Collection</h3>
+      <p>K's Vault collects no data. Specifically:</p>
+      <ul>
+        <li>No personal information is collected</li>
+        <li>No usage analytics or telemetry</li>
+        <li>No cookies or browsing data are transmitted to any server</li>
+        <li>No network requests are made by the extension</li>
+        <li>No third-party services or SDKs are integrated</li>
+      </ul>
+
+      <h3>Data Processing</h3>
+      <p>All data processing occurs entirely on your device:</p>
+      <ul>
+        <li><strong>Master password</strong> — used to derive encryption keys via PBKDF2. Never stored; only a verification hash is kept, which cannot be reversed.</li>
+        <li><strong>Encrypted cookies</strong> — cookie values are encrypted using AES-256-GCM and stored in the extension's local IndexedDB. Encrypted data never leaves your device.</li>
+        <li><strong>Settings</strong> — preferences are stored locally using the browser's extension storage API.</li>
+      </ul>
+
+      <h3>Data Storage</h3>
+      <p>All data is stored locally using IndexedDB (encrypted cookie blobs) and browser extension storage (configuration). No data is stored on external servers, cloud services, or any location outside your browser profile.</p>
+
+      <h3>Data Deletion</h3>
+      <ul>
+        <li><strong>Emergency Wipe</strong> — permanently deletes all encrypted cookies, settings, and vault data.</li>
+        <li><strong>Remove Protection</strong> — decrypts and restores cookies to the browser, then removes them from K's Vault.</li>
+        <li><strong>Uninstalling</strong> — removes all associated storage data.</li>
+      </ul>
+
+      <h3>Third Parties</h3>
+      <p>K's Vault does not integrate with, transmit data to, or receive data from any third-party services.</p>
+
+      <h3>Contact</h3>
+      <p>For questions about this privacy policy or K's Vault:<br>
+      Website: <a href="https://kravex.ro" style="color: var(--green);">kravex.ro</a><br>
+      Email: contact@kravex.ro</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://github.com/windbreaker555/ks-vault">GitHub</a>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="https://kravex.ro">Kravex</a>
+    </div>
+    <p>Built by <a href="https://kravex.ro">Kravex</a> — Penetration Testing & Cybersecurity</p>
+  </footer>
+
+</body>
+</html>

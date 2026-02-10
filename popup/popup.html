@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K's Vault</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- Screen 1: First-time setup -->
+  <div id="screen-setup" class="screen hidden">
+    <div class="header">
+      <div class="logo">K's Vault</div>
+      <p class="subtitle">Set your master password</p>
+    </div>
+    <div class="content">
+      <div class="input-group">
+        <label for="setup-password">Master Password</label>
+        <input type="password" id="setup-password" placeholder="Enter master password" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label for="setup-confirm">Confirm Password</label>
+        <input type="password" id="setup-confirm" placeholder="Confirm master password" autocomplete="off">
+      </div>
+      <div id="setup-error" class="error hidden"></div>
+      <button id="btn-setup" class="btn-primary">Create Vault</button>
+      <p class="hint">This password encrypts your cookies locally. It never leaves your device.</p>
+    </div>
+  </div>
+
+  <!-- Screen 2: Unlock -->
+  <div id="screen-unlock" class="screen hidden">
+    <div class="header">
+      <div class="logo">K's Vault</div>
+      <p class="subtitle">Unlock your vault</p>
+    </div>
+    <div class="content">
+      <div class="input-group">
+        <input type="password" id="unlock-password" placeholder="Master password" autocomplete="off">
+      </div>
+      <div id="unlock-error" class="error hidden"></div>
+      <div id="unlock-attempts" class="attempts hidden">
+        <span id="attempts-remaining"></span> attempts remaining
+      </div>
+      <button id="btn-unlock" class="btn-primary">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Cooldown (after failed attempts) -->
+  <div id="screen-cooldown" class="screen hidden">
+    <div class="header">
+      <div class="logo">K's Vault</div>
+      <p class="subtitle">Too many failed attempts</p>
+    </div>
+    <div class="content">
+      <div class="cooldown-timer">
+        <span id="cooldown-time">15:00</span>
+      </div>
+      <p class="hint">Please wait before trying again.</p>
+    </div>
+  </div>
+
+  <!-- Screen 4: Main dashboard (unlocked) -->
+  <div id="screen-dashboard" class="screen hidden">
+    <div class="header-bar">
+      <div class="logo-small">K's Vault</div>
+      <div class="header-actions">
+        <button id="btn-settings" class="btn-icon" title="Settings">⚙</button>
+        <button id="btn-lock" class="btn-icon" title="Lock">🔒</button>
+      </div>
+    </div>
+    <div class="content">
+      <!-- Status indicator -->
+      <div class="status-bar">
+        <div class="status-dot active"></div>
+        <span>Protection active</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-number" id="protected-count">0</div>
+          <div class="stat-label">Protected domains</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="encrypted-count">0</div>
+          <div class="stat-label">Encrypted cookies</div>
+        </div>
+      </div>
+
+      <!-- Current domain quick action -->
+      <div id="current-domain-section" class="domain-action">
+        <span id="current-domain-name" class="domain-name"></span>
+        <button id="btn-toggle-domain" class="btn-secondary">Protect this site</button>
+      </div>
+      <p id="protect-hint" class="hint hidden">Log in first, then protect. Protecting before login may break the login flow.</p>
+
+      <!-- Panic wipe -->
+      <button id="btn-panic" class="btn-danger">Emergency Wipe</button>
+      <p class="hint">Ctrl+Shift+K</p>
+    </div>
+  </div>
+
+  <!-- Confirmation modal -->
+  <div id="modal-confirm" class="modal hidden">
+    <div class="modal-content">
+      <p id="modal-message"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn-secondary">Cancel</button>
+        <button id="modal-confirm-btn" class="btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

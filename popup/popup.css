@@ -1,0 +1,344 @@
+/* ============================================
+   K's Vault — Browser Extension Styles
+   Colors: #22333B, #EAE0D6, #C5AC8E
+   ============================================ */
+
+:root {
+  --dark: #0C0C0C;
+  --dark-light: #1A1A1A;
+  --dark-lighter: #2A2A2A;
+  --cream: #FBFDF0;
+  --cream-dim: #A8A99E;
+  --gold: #70B270;
+  --gold-hover: #85C285;
+  --gold-dim: #5A9A5A;
+  --danger: #C45B5B;
+  --danger-hover: #D46A6A;
+  --success: #6BAF7A;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 320px;
+  min-height: 200px;
+  background: var(--dark);
+  color: var(--cream);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Screens */
+.screen {
+  padding: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.logo-small {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--cream-dim);
+}
+
+/* Header bar (dashboard) */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--dark-lighter);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Input fields */
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--cream-dim);
+  margin-bottom: 4px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--dark-light);
+  border: 1px solid var(--dark-lighter);
+  border-radius: 6px;
+  color: var(--cream);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input::placeholder {
+  color: var(--cream-dim);
+  opacity: 0.5;
+}
+
+.input-group input:focus {
+  border-color: var(--gold);
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--gold);
+  color: var(--dark);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+
+.btn-primary:hover {
+  background: var(--gold-hover);
+}
+
+.btn-secondary {
+  padding: 6px 14px;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--gold);
+  color: var(--dark);
+}
+
+.btn-danger {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 12px;
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: var(--cream);
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--cream-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.btn-icon:hover {
+  color: var(--cream);
+}
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--dark-light);
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cream-dim);
+}
+
+.status-dot.active {
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+}
+
+.status-dot.inactive {
+  background: var(--danger);
+}
+
+/* Stat cards */
+.stat-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  flex: 1;
+  text-align: center;
+  padding: 14px 10px;
+  background: var(--dark-light);
+  border-radius: 8px;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--cream-dim);
+  margin-top: 2px;
+}
+
+/* Domain action */
+.domain-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--dark-light);
+  border-radius: 6px;
+}
+
+.domain-name {
+  font-size: 13px;
+  color: var(--cream);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Error messages */
+.error {
+  color: var(--danger);
+  font-size: 12px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: rgba(196, 91, 91, 0.1);
+  border-radius: 4px;
+}
+
+/* Attempts counter */
+.attempts {
+  text-align: center;
+  font-size: 12px;
+  color: var(--danger);
+  margin-bottom: 8px;
+}
+
+/* Cooldown timer */
+.cooldown-timer {
+  text-align: center;
+  padding: 24px;
+}
+
+.cooldown-timer span {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--danger);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hints */
+.hint {
+  font-size: 11px;
+  color: var(--cream-dim);
+  text-align: center;
+  margin-top: 10px;
+  opacity: 0.7;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: var(--dark-light);
+  border: 1px solid var(--dark-lighter);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px;
+  max-width: 280px;
+}
+
+.modal-content p {
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-actions .btn-secondary {
+  flex: 1;
+}
+
+.modal-actions .btn-danger {
+  flex: 1;
+  margin-top: 0;
+  width: auto;
+}

@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "K's Vault",
+  "version": "1.0.0",
+  "description": "Encrypt your cookies at rest. Protect your sessions from stealers.",
+  "author": "Kravex",
+  "homepage_url": "https://windbreaker555.github.io/ks-vault",
+
+  "permissions": [
+    "cookies",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "storage",
+    "notifications"
+  ],
+
+  "background": {
+    "scripts": ["lib/crypto.js", "lib/storage.js", "lib/interceptor.js", "background.js"],
+    "persistent": true
+  },
+
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "K's Vault"
+  },
+
+  "options_ui": {
+    "page": "settings/settings.html",
+    "open_in_tab": true
+  },
+
+  "commands": {
+    "panic-wipe": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K"
+      },
+      "description": "Emergency wipe all protected cookies"
+    }
+  },
+
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  }
+}
